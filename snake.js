@@ -8,6 +8,7 @@ class Snake{
 		this.sBody = []
 		this.restart(startX, startY)
 	 	this.vector = GO_RIGHT
+	 	this.isGrow = false
 	}
 	restart(startX, startY){
 		if(this.sBody.length){
@@ -16,18 +17,27 @@ class Snake{
 		this.sBody = [{x: startX || 0,y: startY || 0}]
         this.vector = GO_RIGHT;  //Меняем направление на правую сторону.
 	}
-	render(){
-		this.sBody.forEach(function(el, i){
-		    if ( el.x == this.sBody[this.last].x && el.y == this.sBody[this.last].y && i < last) { 
-		        this.restart()
-			    }
-			if (this.vector == 1) this.head.x = this.tail.x, this.head.y = this.tail.y
-			if (this.vector == 2) this.head.y = this.tail.y, this.head.x = this.tail.x
-			if (this.vector == 3) this.head.x = this.tail.x, this.head.y = this.tail.y
-			if (this.vector == 4) this.head.y = this.tail.y, this.head.x = this.tail.x
+	render(w,h){
+		let buf = { x: 0, y: 0}
+		this.sBody.forEach((el, i)=>{
+			if (this.vector == GO_RIGHT) buf.x = this.tail.x + 1, buf.y = this.tail.y
+			if (this.vector == GO_DOWN) buf.y = this.tail.y + 1, buf.x = this.tail.x
+			if (this.vector == GO_LEFT) buf.x = this.tail.x - 1, buf.y = this.tail.y
+			if (this.vector == GO_UP) buf.y = this.tail.y - 1, buf.x = this.tail.x
+
+			if (this.vector == GO_RIGHT) if (buf.x > w) buf.x = 0;
+	    if (this.vector == GO_DOWN) if (buf.y > h) buf.y = 0;
+	    if (this.vector == GO_LEFT) if (buf.x < 0) buf.x = w;
+	    if (this.vector == GO_UP) if (buf.y < 0) buf.y = h;
+
 		});
-		this.sBody.push(f); //Добавляем хвост после головы с новыми координатами.
-		this.sBody.splice(0,1); //Удаляем хвост.
+		this.sBody.push(buf); //Добавляем хвост после головы с новыми координатами.
+		this.sBody.splice(0,1)
+	}
+	grow(){
+		// this.isGrow = true
+		this.sBody.unshift({ x: this.head.x, y: this.head.y })
+		console.log('I`m ate apple, and i`m grown to 1', this.sBody.length)
 	}
 	rigth(){
 		if(this.vector==GO_LEFT) return
@@ -46,6 +56,9 @@ class Snake{
 		this.vector = GO_DOWN
 	}
 	get length(){
+		return this.sBody.length
+	}
+	get last(){
 		return this.sBody.length - 1
 	}
 	get tail(){
